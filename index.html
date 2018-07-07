@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Image Labeler</title>
+	<script type="text/javascript" src="annotorious.min.js"></script>
+    <script defer src="/__/firebase/5.2.0/firebase-app.js"></script>
+    <script defer src="/__/firebase/5.2.0/firebase-database.js"></script>
+    <script defer src="/__/firebase/init.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link type="text/css" rel="stylesheet" href="annotorious.css" />
+	<style>
+		body { margin: 20px; font-family: sans-serif; max-width: 800px;}
+		button { background-color: #eee; min-width: 90px; border: 1px solid black; padding: 8px; font-size: large;}
+		img.annotatable { width: 600px; height: 400px;}
+		.item { margin-left: 10px; margin-bottom: 50px;}
+		button.btnRemove { font-size: small; background: pink;}
+	</style>
+  </head>
+  <body>
+	  <h1>Instructions</h1>
+	  <p>In this activity, you will be providing labels for a set of 10 images. These labels will be used to help people who are blind to explore the images on a touch screen. Your task is to identify regions on the screen and provide audio labels for them.</p>
+	  <p>This data will be presented to users on a Microsoft Surface tablet, shown below. The tablet screen is approximately 10 inches wide and 7 inches tall (26cm wide and 17cm tall). When the user touches items on the screen with her finger, the name of the object will be spoken out loud. This will allow a person who is blind to understand the structure of the image.</p>
+	  <p><img src="surface.jpg" width=300 height=200/></p>
+	  <p>You will choose how many objects to label and what the labels should be. You must add at least one label for each image.</p>
+	  <p>To add a label, you must drag your mouse cursor over the image, and type the label text in the text box that appears.</p>
+	  <p>If you make a mistake, you can press the "Reset Image" button to reset annotations for that image only.</p>
+		  <p><strong>If no images appear, you may need to enable JavaScript in your browser.</strong></p>
+	<hr/>
+	<h2>Label these images</h2>
+	<div id="images">
+      <div class="item">
+        <img src="img/barnyardScaled.jpg" alt="Barnyard" class="annotatable" >
+		<button class="btnRemove" onclick="resetTags('barnyardScaled.jpg')">Reset annotations for the above image</button>
+      </div>
+      <div class="item">
+        <img src="img/daliScaled.jpg" alt="Dali" class="annotatable">
+		<button class="btnRemove" onclick="resetTags('daliScaled.jpg')">Reset annotations for the above image</button>
+      </div>
+      <div class="item">
+        <img src="img/runawayScaled.jpg" class="annotatable" alt="runaway" >
+		<button class="btnRemove" onclick="resetTags('runawayScaled.jpg')">Reset annotations for the above image</button>
+      </div>
+      <div class="item">
+        <img src="img/nighthawksScaled.jpg" class="annotatable" alt="Nighthawks" >
+		<button class="btnRemove" onclick="resetTags('nighthawksScaled.jpg')">Reset annotations for the above image</button>
+      </div>
+      <div class="item">
+        <img src="img/stilllifeScaled.jpg" class="annotatable" alt="still life">
+		<button class="btnRemove" onclick="resetTags('stilllifeScaled.jpg')">Reset annotations for the above image</button>
+      </div>
+      <div class="item"> 
+        <img src="img/giraffesScaled.jpg" class="annotatable" alt="Giraffes" >
+		<button class="btnRemove" onclick="resetTags('giraffesScaled.jpg')">Reset annotations for the above image</button>
+      </div>
+      <div class="item">
+        <img src="img/mondrianScaled.jpg" class="annotatable" alt="Mondrian"  >
+		<button class="btnRemove" onclick="resetTags('mondrianScaled.jpg')">Reset annotations for the above image</button>
+      </div>
+      <div class="item">
+        <img src="img/pokerScaled.png" class="annotatable" alt="Poker">
+		<button class="btnRemove" onclick="resetTags('pokerScaled.png')">Reset annotations for the above image</button>
+      </div>
+      <div class="item">
+        <img src="img/starrynightScaled.jpg" class="annotatable" alt="Starry Night"  >
+		<button class="btnRemove" onclick="resetTags('starrynightScaled.jpg')">Reset annotations for the above image</button>
+      </div>
+      <div class="item">
+        <img src="img/royalsScaled.jpg" class="annotatable" alt="royals">
+		<button class="btnRemove" onclick="resetTags('royalsScaled.jpg')">Reset annotations for the above image</button>
+      </div>
+  </div>
+	
+  <button onclick="saveData()">Submit image labels and complete task</button>
+	
+	
+    <script>
+	  var startTime;
+	  var imageUrls = [];
+      document.addEventListener('DOMContentLoaded', function() {
+		  startTime = new Date();
+		  $("#images").shuffleChildren();
+		  
+		  $(".item img").each(function(index, value) {
+			  imageUrls.push(value.src);
+		  })
+		  console.log(imageUrls);
+      });
+	  
+	  jQuery.fn.shuffleChildren = function(){
+	      var p = this[0];
+	      for (var i = p.children.length; i >= 0; i--) {
+	          p.appendChild(p.children[Math.random() * i | 0]);
+	      }
+	  };
+	  
+	  function saveData() {
+		  var database = firebase.database();
+		  var time = new Date().toUTCString();
+		  var data = "hi"
+		   var dataRef = database.ref('/testData/').push();//Generates a new child location with a randomly generated id.
+		   dataRef.set({
+			   start: startTime.toUTCString(),
+			 time: time,
+			   annotations: anno.getAnnotations()
+		   });
+		   
+		   // now, check to see if all images are tagged
+		   a = anno.getAnnotations();
+		   allFound = true;
+		   
+		   for (var i = 0; i < imageUrls.length; i++) {
+			   found = false;
+			   for (var j = 0; j < a.length; j++) {
+				   if (a[j].src === imageUrls[i]) {
+					   found = true;
+				   }
+			   }
+			   if (found == false) {
+				   alert("You must add annotations for image " + (i+1).toString())
+				   allFound = false;
+				   break;
+			   }
+		   }
+		   if (allFound) {
+		   	window.location.href = "http://google.com";
+			
+		   }
+		   
+	  }
+	  
+	  function resetTags(url) {
+	  	anno.removeAll(window.location.href + "img/" + url)
+	  }
+    </script>
+  </body>
+</html>
