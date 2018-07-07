@@ -19,12 +19,14 @@ body { margin: 20px; font-family: sans-serif; max-width: 800px;}
 		img.annotatable { width: 600px; height: 400px;}
 		.item { margin-left: 10px; margin-bottom: 50px;}
 		button.btnRemove { font-size: small; background: pink;}
+		#code { min-width: 100px; padding: 8px; border:1px dotted black; background: #F5FFB6; text-align: center;}
 		</style>
 	</head>
 	<body>
 		<h1>
 			Instructions
 		</h1>
+		<p>This activity will take about 10 minutes. When it is done, press the button labeled "Submit image labels and complete task", and you will see a code that you can enter on Mechanical Turk to receive credit for this assignment.
 		<p>
 			In this activity, you will be providing labels for a set of 10 images. These labels will be used to help people who are blind to explore the images on a touch screen. Your task is to identify regions on the screen and provide audio labels for them.
 		</p>
@@ -84,7 +86,10 @@ body { margin: 20px; font-family: sans-serif; max-width: 800px;}
 		</div>
 		<p>
 			<button onclick="saveData()">Submit image labels and complete task</button>
-		</p><script type="text/javascript">
+		</p>
+		<p>Your code will appear here after you submit the results: <span id="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></p>
+		<script type="text/javascript">
+			
   // Initialize Firebase
 		  var config = {
 			apiKey: "AIzaSyDzKy8JBmsQeiO5D4WNKHWcxRVfrGfPVB8",
@@ -114,6 +119,14 @@ body { margin: 20px; font-family: sans-serif; max-width: 800px;}
 			  p.appendChild(p.children[Math.random() * i | 0]);
 		  }
 		};
+		
+		codes = ["spider", "rat", "duck", "unicorn"];
+		
+		function success() {
+			$("#code").text(codes[2]);
+		}
+
+		requireLabelsForEveryImage = false;
 
 		function saveData() {
 		  var database = firebase.database();
@@ -130,6 +143,8 @@ body { margin: 20px; font-family: sans-serif; max-width: 800px;}
 		   a = anno.getAnnotations();
 		   allFound = true;
 		   
+		   if (requireLabelsForEveryImage) {
+		   
 		   for (var i = 0; i < imageUrls.length; i++) {
 			   found = false;
 			   for (var j = 0; j < a.length; j++) {
@@ -144,9 +159,13 @@ body { margin: 20px; font-family: sans-serif; max-width: 800px;}
 			   }
 		   }
 		   if (allFound) {
-			window.location.href = "http://google.com";
+			   success();
 			
 		   }
+	   		}
+			else {
+				success();
+			}
 		   
 		}
 
