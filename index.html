@@ -76,6 +76,21 @@
 	
 	
     <script>
+		<script src="https://www.gstatic.com/firebasejs/5.2.0/firebase.js"></script>
+		<script>
+		  // Initialize Firebase
+		  var config = {
+		    apiKey: "AIzaSyDzKy8JBmsQeiO5D4WNKHWcxRVfrGfPVB8",
+		    authDomain: "image-labeler-584c1.firebaseapp.com",
+		    databaseURL: "https://image-labeler-584c1.firebaseio.com",
+		    projectId: "image-labeler-584c1",
+		    storageBucket: "image-labeler-584c1.appspot.com",
+		    messagingSenderId: "778034683549"
+		  };
+		  firebase.initializeApp(config);
+		</script>
+		
+		
 	  var startTime;
 	  var imageUrls = [];
       document.addEventListener('DOMContentLoaded', function() {
